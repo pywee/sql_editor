@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Postgresql(Insert) editor</title>
+    <title>PostgreSQL insert sentence editor</title>
     <script type="text/javascript" src="https://cache.ip138.com/tool/script/lib/jquery.js"></script>
 
     <style>
@@ -63,17 +63,27 @@
         .c {
             clear: both;
         }
+        
+        .showImg img {
+            float: left;
+            margin-right: 10px;
+            margin-bottom: 20px;
+        }
     </style>
 
 </head>
 
 <body>
-    <h2>Postgresql(Insert) editor</h2>
+    <h2>PostgreSQL insert sentence editor</h2>
+    <div class="showImg">
+        <div class="c"></div>
+    </div>
+    <div class="c"></div>
     <div>
         <div class="l" style="margin-right:30px">
-            <textarea name="" id="" cols="60" rows="30"></textarea>
+            <textarea name="" id="" cols="60" rows="20"></textarea>
             <div>
-                <input type="submit" id="format" style="margin-top:20px" />
+                <input type="submit" id="format" style="margin-top:20px" value="解析" />
             </div>
         </div>
         <div id="ccc" class="shows"></div>
@@ -106,7 +116,6 @@
                 var tmpStr = ''
                 for (i = 0; i < arr1.length; i++) {
                     str = arr1[i]
-                        // 0字符串 1数字
                     t = 0
                     attr = {}
                     if (str == '\'') {
@@ -141,19 +150,48 @@
                 })
                 htmls += '<ul>'
                 for (i = 0; i < sliceKeys.length; i++) {
-                    text = slice[i].text
                     htmls += '<li data="' + slice[i].type + '">'
                     htmls += '<span class="l">' + sliceKeys[i] + '</span>'
-                    if (text[0] == '{' && text.length > 100) {
-                        htmls += `<textarea style="width:570px;height:130px">` + text + `</textarea>`
-                    } else {
-                        htmls += `<input value='` + text + `'>`
-                    }
+                    htmls += `<input value='` + slice[i].text + `'>`
                     htmls += '</li>'
                 }
                 htmls += '</ul>'
                 $('.shows').html(htmls)
-                console.log(htmls, slice)
+            })
+
+            $('.shows').on('click', 'li input', function() {
+                var text = $(this).val()
+                var html = ''
+                if (text[0] == '{') {
+                    text = JSON.parse($(this).val())
+                    if (text.url != undefined) {
+                        idx = text.url.lastIndexOf('.')
+                        if (idx <= 0) {
+                            return
+                        }
+                        fix = text.url.substr(idx + 1)
+                        if (fix == 'jpg' || fix == 'jpeg' || fix == 'png') {
+                            html += '<img src="' + text.url + '" height="70" />'
+                        }
+                    }
+                } else if (text[0] == '[') {
+                    text = JSON.parse($(this).val())
+                    for (i = 0; i < text.length; i++) {
+                        if (text[i].url != undefined) {
+                            idx = text[i].url.lastIndexOf('.')
+                            if (idx <= 0) {
+                                continue
+                            }
+                            fix = text[i].url.substr(idx + 1)
+                            if (fix == 'jpg' || fix == 'jpeg' || fix == 'png') {
+                                html += '<img src="' + text[i].url + '" height="70" />'
+                            }
+                        }
+                    }
+                }
+                if (html.length > 0) {
+                    $('.showImg').html(html)
+                }
             })
 
             $('.shows').on('input', 'li input', function() {
@@ -162,6 +200,7 @@
                     $('.shows li').each(function(k, v) {
                         type = $(this).attr('data')
                         value = $(this).find('input').val()
+                        console.log($(this).find('input'))
                         if (type == 1) {
                             sql += value + ','
                         } else if (type == 0) {
@@ -170,11 +209,8 @@
                     })
                     sql = sql.substr(0, sql.length - 1)
                     sql += ')'
-
-                    console.log(sql)
                     $('textarea').val(sql)
                 })
-
             })
         })()
     </script>
