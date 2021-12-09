@@ -106,6 +106,7 @@
                 var tmpStr = ''
                 for (i = 0; i < arr1.length; i++) {
                     str = arr1[i]
+                        // 0字符串 1数字
                     t = 0
                     attr = {}
                     if (str == '\'') {
@@ -156,9 +157,9 @@
                     $('.shows li').each(function(k, v) {
                         type = $(this).attr('data')
                         value = $(this).find('input').val()
-                        if (type == 0) {
+                        if (type == 1) {
                             sql += value + ','
-                        } else if (type == 1) {
+                        } else if (type == 0) {
                             sql += "'" + value + "',"
                         }
                     })
