@@ -141,9 +141,14 @@
                 })
                 htmls += '<ul>'
                 for (i = 0; i < sliceKeys.length; i++) {
+                    text = slice[i].text
                     htmls += '<li data="' + slice[i].type + '">'
                     htmls += '<span class="l">' + sliceKeys[i] + '</span>'
-                    htmls += `<input value='` + slice[i].text + `'>`
+                    if (text[0] == '{' && text.length > 100) {
+                        htmls += `<textarea style="width:570px;height:130px">` + text + `</textarea>`
+                    } else {
+                        htmls += `<input value='` + text + `'>`
+                    }
                     htmls += '</li>'
                 }
                 htmls += '</ul>'
