@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="text/javascript" src="https://cache.ip138.com/tool/script/lib/jquery.js"></script>
+
+    <style>
+        #format {
+            height: 30px;
+            width: 100px;
+        }
+        
+        textarea {
+            padding: 20px;
+        }
+        
+        * {
+            padding: 0
+        }
+        
+        ul {
+            overflow: hidden;
+        }
+        
+        ul li {
+            list-style: none;
+            overflow: hidden;
+            line-height: 45px;
+            margin-bottom: 10px;
+        }
+        
+        ul li span {
+            display: block;
+            width: 130px;
+            text-align: right;
+        }
+        
+        ul li input {
+            height: 20px;
+            width: 600px;
+            line-height: 20px;
+            padding: 10px 5px;
+            border: 1px solid #bebebe;
+        }
+        
+        ul li span.l {
+            margin-right: 20px;
+            float: left;
+        }
+        
+        .l {
+            float: left;
+        }
+        
+        .r {
+            float: r;
+        }
+        
+        .c {
+            clear: both;
+        }
+    </style>
+
+</head>
+
+<body>
+    <h2>Postgresql(Insert) editor</h2>
+    <div>
+        <div class="l" style="margin-right:30px">
+            <textarea name="" id="" cols="60" rows="30"></textarea>
+            <div>
+                <input type="submit" id="format" style="margin-top:20px" />
+            </div>
+        </div>
+        <div id="ccc" class="shows"></div>
+        <div class="c"></div>
+    </div>
+
+    <hr style="margin-top:30px" />
+
+    <script>
+        (function() {
+            var insert = ''
+            $('#format').click(function(e) {
+                arr = $('textarea').val().split('VALUES')
+                if (arr.length != 2) {
+                    alert('数据错误，无法解析')
+                    return
+                }
+
+                arr0 = arr[0]
+                arr1 = arr[1]
+                insert = arr0
+                arr1 = arr1.replace(');', '')
+                keyIdx = arr0.indexOf('(')
+                arr0 = arr0.substr(keyIdx + 1, 10000)
+                arr0 = arr0.replace(')', '')
+
+                var sliceKeys = arr0.split(",")
+                var synboolFX = 0
+                var slice = new Array()
+                var tmpStr = ''
+                for (i = 0; i < arr1.length; i++) {
+                    str = arr1[i]
+                    t = 0
+                    attr = {}
+                    if (str == '\'') {
+                        synboolFX++
+                    }
+                    if (str == ',' && synboolFX % 2 == 0) {
+                        tmpStr = tmpStr.trim()
+                        if (tmpStr[0][0] == '(') {
+                            tmpStr = tmpStr.replace('(', '')
+                        }
+                        if (tmpStr[0] == '\'') {
+                            t = 0
+                            tmpStr = tmpStr.substr(1)
+                            tmpStr = tmpStr.substr(0, tmpStr.length - 1)
+                        } else {
+                            t = 1
+                        }
+                        slice.push({
+                            text: tmpStr,
+                            type: t
+                        })
+                        tmpStr = ''
+                    } else {
+                        tmpStr += str
+                    }
+                }
+
+                htmls = ''
+                slice.push({
+                    text: tmpStr.trim(),
+                    type: 0
+                })
+                htmls += '<ul>'
+                for (i = 0; i < sliceKeys.length; i++) {
+                    htmls += '<li data="' + slice[i].type + '">'
+                    htmls += '<span class="l">' + sliceKeys[i] + '</span>'
+                    htmls += `<input value='` + slice[i].text + `'>`
+                    htmls += '</li>'
+                }
+                htmls += '</ul>'
+                $('.shows').html(htmls)
+                console.log(htmls, slice)
+            })
+
+            $('.shows').on('input', 'li input', function() {
+                $('.shows li').each(function(k, v) {
+                    var sql = insert + "VALUES("
+                    $('.shows li').each(function(k, v) {
+                        type = $(this).attr('data')
+                        value = $(this).find('input').val()
+                        if (type == 0) {
+                            sql += value + ','
+                        } else if (type == 1) {
+                            sql += "'" + value + "',"
+                        }
+                    })
+                    sql = sql.substr(0, sql.length - 1)
+                    sql += ')'
+
+                    console.log(sql)
+                    $('textarea').val(sql)
+                })
+
+            })
+        })()
+    </script>
+</body>
+
+</html>
