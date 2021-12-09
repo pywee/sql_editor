@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PostgreSQL insert sentence editor</title>
+    <title>PostgreSQL 插入语句编辑</title>
     <script type="text/javascript" src="https://cache.ip138.com/tool/script/lib/jquery.js"></script>
 
     <style>
@@ -74,7 +74,7 @@
 </head>
 
 <body>
-    <h2>PostgreSQL insert sentence editor</h2>
+    <h2>PostgreSQL 插入语句编辑</h2>
     <div class="showImg">
         <div class="c"></div>
     </div>
@@ -143,11 +143,19 @@
                     }
                 }
 
-                htmls = ''
+                tmpStr = tmpStr.trim()
+                if (tmpStr[0] == '\'') {
+                    t = 0
+                    tmpStr = tmpStr.replace('\'', '')
+                } else {
+                    t = 1
+                }
                 slice.push({
                     text: tmpStr.trim(),
-                    type: 0
+                    type: t
                 })
+
+                htmls = ''
                 htmls += '<ul>'
                 for (i = 0; i < sliceKeys.length; i++) {
                     htmls += '<li data="' + slice[i].type + '">'
